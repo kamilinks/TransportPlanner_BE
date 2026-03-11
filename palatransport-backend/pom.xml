@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                             https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!--
+        PARENT: Eredita la configurazione base di Spring Boot.
+        Così non dobbiamo specificare le versioni di ogni libreria manualmente,
+        Spring Boot le gestisce in modo compatibile automaticamente.
+    -->
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.4.3</version>
+        <relativePath/>
+    </parent>
+
+    <!--
+        IDENTITÀ DEL PROGETTO:
+        - groupId: è come il "namespace" del progetto, di solito il dominio al contrario
+        - artifactId: il nome del jar che verrà generato
+        - version: la versione del nostro software
+    -->
+    <groupId>it.palatransport</groupId>
+    <artifactId>palatransport-backend</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>palatransport-backend</name>
+    <description>Backend REST API per PALATRANSPORT Planner</description>
+
+    <properties>
+        <!-- Versione di Java da usare -->
+        <java.version>17</java.version>
+        <!-- Versione della libreria JWT che useremo per i token di autenticazione -->
+        <jjwt.version>0.12.6</jjwt.version>
+    </properties>
+
+    <dependencies>
+
+        <!--
+            SPRING WEB: permette di creare i controller REST,
+            cioè gli endpoint HTTP come GET /api/autisti, POST /api/viaggi, ecc.
+            Internamente usa Tomcat (un server web) integrato.
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <!--
+            SPRING DATA JPA: ci permette di interagire col database
+            usando classi Java (Entities) invece di scrivere SQL grezzo.
+            JPA = "Java Persistence API", la specifica che Hibernate implementa.
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+
+        <!--
+            SPRING SECURITY: gestisce l'autenticazione e l'autorizzazione.
+            Lo useremo per proteggere i nostri endpoint: solo chi ha un
+            token JWT valido potrà accedere alle API.
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+
+        <!--
+            VALIDATION: ci permette di validare i dati che arrivano nelle richieste.
+            Es: @NotBlank sul campo email per assicurarsi che non sia vuoto.
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+
+        <!--
+            POSTGRESQL DRIVER: permette a Spring Data JPA di comunicare
+            con il database PostgreSQL reale invece che usare quello in memoria H2.
+        -->
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!--
+            LOMBOK: libreria che genera automaticamente codice boilerplate
+            tramite annotazioni Java. Ad esempio:
+            @Getter      → genera tutti i metodi getXxx()
+            @Setter      → genera tutti i metodi setXxx()
+            @Builder     → pattern Builder per costruire oggetti facilmente
+            @NoArgsConstructor / @AllArgsConstructor → costruttori
+        -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <!--
+            JJWT (Java JWT): libreria per creare, firmare e verificare i token JWT.
+            Un JWT è un "biglietto" digitale che il server rilascia dopo il login,
+            e il client deve presentare ad ogni richiesta successiva.
+            Suddivisa in 3 moduli: api (interfacce), impl (logica), jackson (serializzazione).
+        -->
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-api</artifactId>
+            <version>${jjwt.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-impl</artifactId>
+            <version>${jjwt.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-jackson</artifactId>
+            <version>${jjwt.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- TEST: dipendenza standard per i test unitari con JUnit 5 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!--
+                Plugin Maven di Spring Boot: permette di eseguire l'applicazione
+                con il comando "mvn spring-boot:run" e di creare un JAR eseguibile.
+            -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <!-- Esclude Lombok dalla compilazione finale (non serve a runtime) -->
+                    <excludes>
+                        <exclude>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                        </exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
