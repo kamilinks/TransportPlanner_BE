@@ -36,6 +36,10 @@ public class ViaggioRequest {
     private Long descrizioneSalitaId;
     private Long descrizioneDiscesaId;
 
+    // Clienti
+    private Long clienteSalitaId;
+    private Long clienteDiscesaId;
+
     @NotBlank(message = "Il luogo di partenza è obbligatorio")
     private String luogoPartenza;
 

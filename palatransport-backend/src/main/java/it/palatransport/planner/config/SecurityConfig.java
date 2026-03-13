@@ -65,11 +65,15 @@ public class SecurityConfig {
             // Disabilita CSRF (non necessario per REST API stateless)
             .csrf(AbstractHttpConfigurer::disable)
 
-            // Configura CORS permettendo le chiamate da Angular
+            // CORS collegato direttamente alla source configurata qui sotto.
+            // Questo garantisce che il preflight OPTIONS venga gestito PRIMA
+            // che Spring Security tenti di autenticare la richiesta.
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
 
             // Regole di autorizzazione
             .authorizeHttpRequests(auth -> auth
+                // Le richieste OPTIONS (preflight CORS) devono passare senza token
+                .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
                 // Endpoint PUBBLICI: accessibili senza JWT
                 .requestMatchers("/api/auth/**").permitAll()  // Login
                 .requestMatchers("/h2-console/**").permitAll() // Console H2 per sviluppo
@@ -81,17 +85,14 @@ public class SecurityConfig {
             .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()))
 
             // Gestione sessione: STATELESS = nessuna sessione HTTP sul server.
-            // Spring Security non creerà cookie di sessione.
-            // Ogni richiesta è indipendente e deve portare il suo JWT.
             .sessionManagement(session ->
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
 
-            // Usa il nostro AuthenticationProvider (che usa BCrypt + UserDetailsService)
+            // Usa il nostro AuthenticationProvider
             .authenticationProvider(authenticationProvider())
 
-            // Inserisce il nostro filtro JWT PRIMA del filtro standard Spring Security.
-            // Così il JWT viene verificato prima che Spring provi a fare autenticazione standard.
+            // Inserisce il filtro JWT PRIMA del filtro standard di autenticazione
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
@@ -108,22 +109,16 @@ public class SecurityConfig {
      */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-
-        // Origini permesse: il frontend Angular in sviluppo
-        configuration.setAllowedOrigins(List.of("http://localhost:4200"));
-
-        // Metodi HTTP permessi
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-
-        // Header permessi nelle richieste (Authorization per il JWT!)
-        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
-
-        // Permette di inviare credenziali (cookie, Authorization header)
-        configuration.setAllowCredentials(true);
-
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration); // Applica a tutti i path
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowCredentials(true);
+        // Origini permesse: il frontend Angular in sviluppo
+        config.setAllowedOrigins(List.of("http://localhost:4200", "http://127.0.0.1:4200"));
+        config.setAllowedHeaders(List.of("*"));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+        config.setExposedHeaders(List.of("Authorization"));
+        config.setMaxAge(3600L);
+        source.registerCorsConfiguration("/**", config);
         return source;
     }
 

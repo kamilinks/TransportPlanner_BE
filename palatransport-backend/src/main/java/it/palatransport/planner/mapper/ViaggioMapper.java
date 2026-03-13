@@ -49,5 +49,11 @@ public interface ViaggioMapper {
     @Mapping(source = "descrizioneDiscesa.id",          target = "descrizioneDiscesaId")
     @Mapping(source = "descrizioneDiscesa.descrizione", target = "descrizioneDiscesa")
 
+    // --- Dati Clienti ---
+    @Mapping(source = "clienteSalita.id",   target = "clienteSalitaId")
+    @Mapping(source = "clienteSalita.nome", target = "clienteSalitaNome")
+    @Mapping(source = "clienteDiscesa.id",   target = "clienteDiscesaId")
+    @Mapping(source = "clienteDiscesa.nome", target = "clienteDiscesaNome")
+
     ViaggioResponse toResponse(Viaggio viaggio);
 }

@@ -90,6 +90,20 @@ public class Viaggio {
     @JoinColumn(name = "descrizione_discesa_id")
     private DescrizioneViaggio descrizioneDiscesa;
 
+    /**
+     * Cliente che paga o richiede la tratta di SALITA.
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cliente_salita_id")
+    private Cliente clienteSalita;
+
+    /**
+     * Cliente che paga o richiede la tratta di DISCESA.
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cliente_discesa_id")
+    private Cliente clienteDiscesa;
+
     // --- DATI DEL VIAGGIO ---
 
     @Column(nullable = false)

@@ -31,6 +31,7 @@ public class ViaggioService {
     private final AutistaRepository autistaRepository;
     private final VeicoloRepository veicoloRepository;
     private final DescrizioneViaggioRepository descrizioneViaggioRepository;
+    private final ClienteRepository clienteRepository;
     private final TariffaConfigRepository tariffaConfigRepository;
     private final ViaggioMapper viaggioMapper; // ← nuovo: mapper per toResponse
 
@@ -149,6 +150,14 @@ public class ViaggioService {
         }
         if (request.getDescrizioneDiscesaId() != null) {
             viaggio.setDescrizioneDiscesa(descrizioneViaggioRepository.findById(request.getDescrizioneDiscesaId()).orElse(null));
+        }
+
+        // Risoluzione Clienti
+        if (request.getClienteSalitaId() != null) {
+            viaggio.setClienteSalita(clienteRepository.findById(request.getClienteSalitaId()).orElse(null));
+        }
+        if (request.getClienteDiscesaId() != null) {
+            viaggio.setClienteDiscesa(clienteRepository.findById(request.getClienteDiscesaId()).orElse(null));
         }
 
         return viaggio;

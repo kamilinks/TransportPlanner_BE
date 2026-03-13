@@ -45,6 +45,12 @@ public class ViaggioResponse {
     private Long descrizioneDiscesaId;
     private String descrizioneDiscesa;
 
+    // Clienti
+    private Long clienteSalitaId;
+    private String clienteSalitaNome;
+    private Long clienteDiscesaId;
+    private String clienteDiscesaNome;
+
     private String luogoPartenza;
     private String luogoDestinazione;
     private Double km;
