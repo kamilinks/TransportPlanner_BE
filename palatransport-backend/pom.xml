@@ -34,6 +34,8 @@
         <java.version>17</java.version>
         <!-- Versione della libreria JWT che useremo per i token di autenticazione -->
         <jjwt.version>0.12.6</jjwt.version>
+        <!-- Versione di MapStruct per il mapping automatico DTO ↔ Entity -->
+        <mapstruct.version>1.6.3</mapstruct.version>
     </properties>
 
     <dependencies>
@@ -102,6 +104,17 @@
         </dependency>
 
         <!--
+            MAPSTRUCT: genera automaticamente il codice di mapping tra classi Java
+            (ad esempio Entity ↔ DTO) leggendo le interfacce @Mapper a compile-time.
+            Non aggiunge overhead a runtime: il codice generato è plain Java.
+        -->
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId>
+            <version>${mapstruct.version}</version>
+        </dependency>
+
+        <!--
             JJWT (Java JWT): libreria per creare, firmare e verificare i token JWT.
             Un JWT è un "biglietto" digitale che il server rilascia dopo il login,
             e il client deve presentare ad ogni richiesta successiva.
@@ -157,6 +170,42 @@
                             <artifactId>lombok</artifactId>
                         </exclude>
                     </excludes>
+                </configuration>
+            </plugin>
+
+            <!--
+                maven-compiler-plugin: configura gli annotation processor.
+
+                PROBLEMA: Lombok e MapStruct sono entrambi annotation processor.
+                Se Maven li esegue nell'ordine sbagliato, MapStruct non trova
+                i getter/setter generati da Lombok e fallisce.
+
+                SOLUZIONE: specifichiamo esplicitamente l'ordine:
+                  1. lombok-mapstruct-binding → garantisce che Lombok giri PRIMA
+                  2. lombok → genera getter/setter/builder
+                  3. mapstruct-processor → usa i getter/setter appena generati
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok-mapstruct-binding</artifactId>
+                            <version>0.2.0</version>
+                        </path>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>${lombok.version}</version>
+                        </path>
+                        <path>
+                            <groupId>org.mapstruct</groupId>
+                            <artifactId>mapstruct-processor</artifactId>
+                            <version>${mapstruct.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
                 </configuration>
             </plugin>
         </plugins>

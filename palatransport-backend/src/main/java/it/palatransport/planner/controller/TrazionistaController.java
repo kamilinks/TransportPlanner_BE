@@ -1,7 +1,9 @@
 package it.palatransport.planner.controller;
 
-import it.palatransport.planner.model.Trazionista;
-import it.palatransport.planner.repository.TrazionistaRepository;
+import it.palatransport.planner.dto.TrazionistaRequest;
+import it.palatransport.planner.dto.TrazionistaResponse;
+import it.palatransport.planner.service.TrazionistaService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,50 +11,46 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * CONTROLLER: TrazionistaController
+ *
+ * CRUD per i trazionisti.
+ * Refactored: non accede più direttamente al repository,
+ * ma delega tutta la logica a TrazionistaService e usa DTO.
+ */
 @RestController
 @RequestMapping("/api/trazionisti")
 @RequiredArgsConstructor
 public class TrazionistaController {
 
-    private final TrazionistaRepository trazionistaRepository;
+    private final TrazionistaService trazionistaService;
 
     @GetMapping
-    public ResponseEntity<List<Trazionista>> getAll() {
-        return ResponseEntity.ok(trazionistaRepository.findAll());
+    public ResponseEntity<List<TrazionistaResponse>> getAll() {
+        return ResponseEntity.ok(trazionistaService.getAll());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Trazionista> getById(@PathVariable Long id) {
-        return trazionistaRepository.findById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<TrazionistaResponse> getById(@PathVariable Long id) {
+        return ResponseEntity.ok(trazionistaService.getById(id));
     }
 
     @PostMapping
-    public ResponseEntity<Trazionista> create(@RequestBody Trazionista trazionista) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(trazionistaRepository.save(trazionista));
+    public ResponseEntity<TrazionistaResponse> create(@Valid @RequestBody TrazionistaRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(trazionistaService.create(request));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Trazionista> update(@PathVariable Long id, @RequestBody Trazionista aggiornamento) {
-        return trazionistaRepository.findById(id)
-                .map(esistente -> {
-                    esistente.setNome(aggiornamento.getNome());
-                    esistente.setPartitaIva(aggiornamento.getPartitaIva());
-                    esistente.setIndirizzo(aggiornamento.getIndirizzo());
-                    esistente.setTelefono(aggiornamento.getTelefono());
-                    esistente.setEmail(aggiornamento.getEmail());
-                    return ResponseEntity.ok(trazionistaRepository.save(esistente));
-                })
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<TrazionistaResponse> update(
+            @PathVariable Long id,
+            @Valid @RequestBody TrazionistaRequest request
+    ) {
+        return ResponseEntity.ok(trazionistaService.update(id, request));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-        if (!trazionistaRepository.existsById(id)) {
-            return ResponseEntity.notFound().build();
-        }
-        trazionistaRepository.deleteById(id);
+        trazionistaService.delete(id);
         return ResponseEntity.noContent().build();
     }
 }

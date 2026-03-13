@@ -9,26 +9,18 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 /**
- * DATA INITIALIZER: carica i dati demo all'avvio dell'applicazione.
+ * DATA INITIALIZER: seed idempotente del database PostgreSQL all'avvio.
  *
  * Questa classe implementa CommandLineRunner: il metodo run() viene eseguito
- * automaticamente da Spring Boot subito dopo che l'applicazione è partita
- * e il database è pronto.
+ * automaticamente da Spring Boot subito dopo l'avvio, quando il database è pronto.
  *
- * Serve a due scopi:
- *   1. PRE-POPOLARE il database H2 (in memoria) con dati di default
- *      ogni volta che l'applicazione si avvia.
- *      (Con H2 "create-drop" i dati vengono persi ad ogni riavvio)
- *   2. CREARE l'utente di default per poter fare il login subito.
+ * Esegue due operazioni idempotenti (sicure anche su riavvii successivi):
+ *   1. CREA GLI UTENTI DI DEFAULT se non esistono ancora, in modo da poter
+ *      fare il login al primo avvio su un database pulito.
+ *   2. CREA LA CONFIGURAZIONE TARIFFE DI DEFAULT se la tabella è vuota,
+ *      fornendo valori base necessari per il calcolo dei preventivi.
  *
- * IMPORTANTE: Questi dati rispecchiano quelli finti (mock) del frontend Angular,
- *   quindi il comportamento dell'app sarà identico a prima, ma ora i dati
- *   vengono dal database H2 invece che dalla memoria del browser.
- *
- * @Component → Spring gestisce questa classe come Bean.
- * @Slf4j (Lombok) → genera automaticamente il logger:
- *   private static final Logger log = LoggerFactory.getLogger(DataInitializer.class);
- *   Usiamo log.info() per stampare messaggi nel terminale all'avvio.
+ * Nessuna operazione viene ripetuta se i dati esistono già (check preventivo).
  */
 @Component
 @RequiredArgsConstructor

@@ -1,7 +1,9 @@
 package it.palatransport.planner.controller;
 
-import it.palatransport.planner.model.Veicolo;
-import it.palatransport.planner.repository.VeicoloRepository;
+import it.palatransport.planner.dto.VeicoloRequest;
+import it.palatransport.planner.dto.VeicoloResponse;
+import it.palatransport.planner.service.VeicoloService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,61 +14,43 @@ import java.util.List;
 /**
  * CONTROLLER: VeicoloController
  *
- * CRUD per i veicoli (camion/mezzi dell'azienda).
- * Pattern identico a AutistaController: Get All, Get By Id, Create, Update, Delete.
- *
- * Per semplicità, usiamo direttamente il Repository senza passare per un Service dedicato.
- * In un progetto più grande avremmo un VeicoloService, ma per entità semplici
- * come questa è accettabile mettere la logica minimale nel Controller.
- * (In realtà andrebbero tutti nel Service, ma voglio mostrarti entrambi i pattern)
+ * CRUD per i veicoli.
+ * Refactored: ora usa VeicoloService e DTO invece di accedere
+ * direttamente al repository con l'entity grezza.
  */
 @RestController
 @RequestMapping("/api/veicoli")
 @RequiredArgsConstructor
 public class VeicoloController {
 
-    // In questo Controller iniettiamo direttamente il Repository (senza Service layer).
-    // Questo è il "thin controller" pattern, accettabile quando non c'è business logic.
-    private final VeicoloRepository veicoloRepository;
+    private final VeicoloService veicoloService;
 
     @GetMapping
-    public ResponseEntity<List<Veicolo>> getAll() {
-        return ResponseEntity.ok(veicoloRepository.findAll());
+    public ResponseEntity<List<VeicoloResponse>> getAll() {
+        return ResponseEntity.ok(veicoloService.getAll());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Veicolo> getById(@PathVariable Long id) {
-        return veicoloRepository.findById(id)
-                .map(ResponseEntity::ok)
-                // .map() sul Optional: se presente restituisce 200 OK con il veicolo
-                // .orElse() se non presente restituisce 404 Not Found
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<VeicoloResponse> getById(@PathVariable Long id) {
+        return ResponseEntity.ok(veicoloService.getById(id));
     }
 
     @PostMapping
-    public ResponseEntity<Veicolo> create(@RequestBody Veicolo veicolo) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(veicoloRepository.save(veicolo));
+    public ResponseEntity<VeicoloResponse> create(@Valid @RequestBody VeicoloRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(veicoloService.create(request));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Veicolo> update(@PathVariable Long id, @RequestBody Veicolo aggiornamento) {
-        return veicoloRepository.findById(id)
-                .map(esistente -> {
-                    // Aggiorna i campi dell'entity esistente
-                    esistente.setTarga(aggiornamento.getTarga());
-                    esistente.setTipo(aggiornamento.getTipo());
-                    esistente.setCategoria(aggiornamento.getCategoria());
-                    return ResponseEntity.ok(veicoloRepository.save(esistente));
-                })
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<VeicoloResponse> update(
+            @PathVariable Long id,
+            @Valid @RequestBody VeicoloRequest request
+    ) {
+        return ResponseEntity.ok(veicoloService.update(id, request));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-        if (!veicoloRepository.existsById(id)) {
-            return ResponseEntity.notFound().build();
-        }
-        veicoloRepository.deleteById(id);
+        veicoloService.delete(id);
         return ResponseEntity.noContent().build();
     }
 }
