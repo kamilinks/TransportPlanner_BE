@@ -43,4 +43,10 @@ public class Autista {
      */
     @Column(nullable = false, columnDefinition = "boolean default true")
     private boolean attivo;
+
+    @Column(name = "is_trazionista", nullable = false, columnDefinition = "boolean default false")
+    private boolean trazionista;
+
+    @Column(name = "tariffa_km")
+    private Double tariffaKm;
 }

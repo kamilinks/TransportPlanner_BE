@@ -1,5 +1,6 @@
 package it.palatransport.planner.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
@@ -22,4 +23,9 @@ public class AutistaRequest {
 
     // Il client può specificare se l'autista è attivo (default: true al momento della creazione)
     private boolean attivo = true;
+
+    @JsonProperty("isTrazionista")
+    private boolean trazionista;
+
+    private Double tariffaKm;
 }

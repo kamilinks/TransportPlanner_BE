@@ -1,5 +1,6 @@
 package it.palatransport.planner.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
 
@@ -18,4 +19,7 @@ public class AutistaResponse {
     private String nome;
     private String cognome;
     private boolean attivo;
+    @JsonProperty("isTrazionista")
+    private boolean trazionista;
+    private Double tariffaKm;
 }

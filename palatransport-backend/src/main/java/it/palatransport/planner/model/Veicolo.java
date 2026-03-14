@@ -45,6 +45,13 @@ public class Veicolo {
     private TipoVeicolo tipo;
 
     /**
+     * Rappresenta se il veicolo è un Trattore o un Semirimorchio.
+     */
+    @Enumerated(EnumType.STRING)
+    @Column(name = "tipologia_mezzo")
+    private TipologiaMezzo tipologiaMezzo;
+
+    /**
      * "categoria" è nullable: nel modello Angular era definito come "categoria?",
      * con il punto interrogativo che significa "opzionale".
      */
@@ -58,5 +65,10 @@ public class Veicolo {
     public enum TipoVeicolo {
         SALITA,
         DISCESA
+    }
+
+    public enum TipologiaMezzo {
+        TRATTORE,
+        SEMIRIMORCHIO
     }
 }

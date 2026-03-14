@@ -15,9 +15,12 @@ import org.mapstruct.MappingTarget;
 @Mapper(componentModel = "spring")
 public interface VeicoloMapper {
 
+    @org.mapstruct.Mapping(source = "tipologiaMezzo", target = "tipologiaMezzo")
     VeicoloResponse toResponse(Veicolo veicolo);
 
+    @org.mapstruct.Mapping(source = "tipologiaMezzo", target = "tipologiaMezzo")
     Veicolo fromRequest(VeicoloRequest request);
 
+    @org.mapstruct.Mapping(source = "tipologiaMezzo", target = "tipologiaMezzo")
     void updateFromRequest(VeicoloRequest request, @MappingTarget Veicolo veicolo);
 }
