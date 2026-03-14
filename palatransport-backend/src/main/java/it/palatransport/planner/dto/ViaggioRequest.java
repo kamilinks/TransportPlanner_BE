@@ -53,8 +53,8 @@ public class ViaggioRequest {
     private String orario;
 
     // I booleani hanno default false se non specificati
-    private boolean isSabato;
-    private boolean isDomenica;
+    private boolean sabato;
+    private boolean domenica;
     private boolean sostaNotturna;
     private boolean facchinaggio;
     private boolean lavoroAggiuntivo;

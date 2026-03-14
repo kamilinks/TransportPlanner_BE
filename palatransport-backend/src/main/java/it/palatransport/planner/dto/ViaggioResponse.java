@@ -58,8 +58,8 @@ public class ViaggioResponse {
     private Double tariffaTotale;
     private String trazione;
     private String orario;
-    private boolean isSabato;
-    private boolean isDomenica;
+    private boolean sabato;
+    private boolean domenica;
     private boolean sostaNotturna;
     private boolean facchinaggio;
     private boolean lavoroAggiuntivo;

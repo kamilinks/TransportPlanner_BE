@@ -143,11 +143,11 @@ public class Viaggio {
 
     /** Il viaggio cade di sabato? */
     @Column(nullable = false)
-    private boolean isSabato;
+    private boolean sabato;
 
     /** Il viaggio cade di domenica? */
     @Column(nullable = false)
-    private boolean isDomenica;
+    private boolean domenica;
 
     /** È prevista una sosta notturna? */
     @Column(nullable = false)
