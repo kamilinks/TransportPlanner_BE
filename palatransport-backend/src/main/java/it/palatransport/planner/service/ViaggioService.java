@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 @RequiredArgsConstructor
+@lombok.extern.slf4j.Slf4j
 public class ViaggioService {
 
     private final ViaggioRepository viaggioRepository;
@@ -32,26 +33,36 @@ public class ViaggioService {
     private final VeicoloRepository veicoloRepository;
     private final DescrizioneViaggioRepository descrizioneViaggioRepository;
     private final ClienteRepository clienteRepository;
-    private final TariffaConfigRepository tariffaConfigRepository;
-    private final ViaggioMapper viaggioMapper; // ← nuovo: mapper per toResponse
+    private final PricingService pricingService; // ← nuovo: delegato per il calcolo
+    private final ViaggioMapper viaggioMapper;
 
     @Transactional(readOnly = true)
     public List<ViaggioResponse> getAll() {
+        log.info("Recupero tutti i viaggi");
         return viaggioRepository.findAll()
                 .stream()
-                .map(viaggioMapper::toResponse) // ← prima era: map(this::toResponse)
+                .map(viaggioMapper::toResponse)
                 .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
+    public org.springframework.data.domain.Page<ViaggioResponse> getAllPaginated(org.springframework.data.domain.Pageable pageable) {
+        log.info("Recupero viaggi paginati: {}", pageable);
+        return viaggioRepository.findAll(pageable)
+                .map(viaggioMapper::toResponse);
+    }
+
+    @Transactional(readOnly = true)
     public ViaggioResponse getById(Long id) {
+        log.info("Recupero viaggio con id: {}", id);
         Viaggio viaggio = viaggioRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Viaggio non trovato con id: " + id));
+                .orElseThrow(() -> new it.palatransport.planner.exception.ResourceNotFoundException("Viaggio non trovato con id: " + id));
         return viaggioMapper.toResponse(viaggio);
     }
 
     @Transactional(readOnly = true)
     public List<ViaggioResponse> getByAutista(Long autistaId) {
+        log.info("Recupero viaggi per autista: {}", autistaId);
         return viaggioRepository.findByAutistaId(autistaId)
                 .stream()
                 .map(viaggioMapper::toResponse)
@@ -59,22 +70,25 @@ public class ViaggioService {
     }
 
     public ViaggioResponse create(ViaggioRequest request) {
+        log.info("Creazione nuovo viaggio per autista id: {}", request.getAutistaId());
         Viaggio viaggio = fromRequest(request, new Viaggio());
-        calcolaTariffa(viaggio, request);
+        pricingService.calcolaTariffa(viaggio, request);
         return viaggioMapper.toResponse(viaggioRepository.save(viaggio));
     }
 
     public ViaggioResponse update(Long id, ViaggioRequest request) {
+        log.info("Aggiornamento viaggio con id: {}", id);
         Viaggio esistente = viaggioRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Viaggio non trovato con id: " + id));
+                .orElseThrow(() -> new it.palatransport.planner.exception.ResourceNotFoundException("Viaggio non trovato con id: " + id));
         fromRequest(request, esistente);
-        calcolaTariffa(esistente, request);
+        pricingService.calcolaTariffa(esistente, request);
         return viaggioMapper.toResponse(viaggioRepository.save(esistente));
     }
 
     public void delete(Long id) {
+        log.warn("Eliminazione viaggio con id: {}", id);
         if (!viaggioRepository.existsById(id)) {
-            throw new RuntimeException("Viaggio non trovato con id: " + id);
+            throw new it.palatransport.planner.exception.ResourceNotFoundException("Viaggio non trovato con id: " + id);
         }
         viaggioRepository.deleteById(id);
     }
@@ -84,41 +98,8 @@ public class ViaggioService {
     // =========================================================================
 
     /**
-     * Calcolo tariffe: logica di business che non può essere delegata a MapStruct.
-     * Legge la configurazione dal DB e applica le maggiorazioni.
-     */
-    private void calcolaTariffa(Viaggio viaggio, ViaggioRequest request) {
-        TariffaConfig config = tariffaConfigRepository.findFirstByOrderByIdAsc()
-                .orElseGet(() -> {
-                    TariffaConfig defaults = new TariffaConfig();
-                    defaults.setTariffaBaseKm(1.15);
-                    defaults.setMaggiorazioneSabato(50.0);
-                    defaults.setMaggiorazioneDomenica(80.0);
-                    defaults.setMaggiorazioneBlue(30.0);
-                    defaults.setMaggiorazioneSosta(40.0);
-                    defaults.setMaggiorazioneFacchinaggio(25.0);
-                    defaults.setMaggiorazioneLavAgg(35.0);
-                    return defaults;
-                });
-
-        double tariffaBase = request.getKm() * config.getTariffaBaseKm();
-        viaggio.setTariffaBase(tariffaBase);
-
-        double tariffaTotale = tariffaBase;
-        if (request.isSabato())          tariffaTotale += config.getMaggiorazioneSabato();
-        if (request.isDomenica())         tariffaTotale += config.getMaggiorazioneDomenica();
-        if ("BLUE".equals(request.getTrazione())) tariffaTotale += config.getMaggiorazioneBlue();
-        if (request.isSostaNotturna())    tariffaTotale += config.getMaggiorazioneSosta();
-        if (request.isFacchinaggio())     tariffaTotale += config.getMaggiorazioneFacchinaggio();
-        if (request.isLavoroAggiuntivo()) tariffaTotale += config.getMaggiorazioneLavAgg();
-
-        viaggio.setTariffaTotale(tariffaTotale);
-    }
-
-    /**
      * Mapping DTO → Entity per Viaggio.
      * Rimane manuale perché risolve gli ID in Entity tramite query al database.
-     * MapStruct non può fare questo.
      */
     private Viaggio fromRequest(ViaggioRequest request, Viaggio viaggio) {
         viaggio.setData(request.getData());
@@ -136,7 +117,7 @@ public class ViaggioService {
 
         // Risolve gli ID → Entity (richiede query DB: non delegabile a MapStruct)
         Autista autista = autistaRepository.findById(request.getAutistaId())
-                .orElseThrow(() -> new RuntimeException("Autista non trovato: " + request.getAutistaId()));
+                .orElseThrow(() -> new it.palatransport.planner.exception.ResourceNotFoundException("Autista non trovato: " + request.getAutistaId()));
         viaggio.setAutista(autista);
 
         if (request.getVeicoloSalitaId() != null) {

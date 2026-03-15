@@ -10,11 +10,14 @@ import lombok.*;
  */
 @Entity
 @Table(name = "clienti")
-@Data
-@Builder
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Cliente {
+@Builder
+@org.hibernate.annotations.SQLDelete(sql = "UPDATE clienti SET deleted = true WHERE id=?")
+@org.hibernate.annotations.SQLRestriction("deleted = false")
+public class Cliente extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

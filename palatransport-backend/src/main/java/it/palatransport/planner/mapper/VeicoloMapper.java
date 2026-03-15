@@ -12,7 +12,7 @@ import org.mapstruct.MappingTarget;
  * MapStruct gestisce automaticamente la mappatura dell'enum TipoVeicolo
  * (SALITA/DISCESA), perché il tipo è lo stesso sia nella Entity che nel DTO.
  */
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", unmappedTargetPolicy = org.mapstruct.ReportingPolicy.IGNORE)
 public interface VeicoloMapper {
 
     @org.mapstruct.Mapping(source = "tipologiaMezzo", target = "tipologiaMezzo")

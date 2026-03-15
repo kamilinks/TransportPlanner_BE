@@ -25,7 +25,7 @@ import org.mapstruct.Mapping;
  * per risolvere gli ID in oggetti Entity (es. autistaId → Autista).
  * Quella logica rimane nel ViaggioService dove possiamo accedere ai Repository.
  */
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", unmappedTargetPolicy = org.mapstruct.ReportingPolicy.IGNORE)
 public interface ViaggioMapper {
 
     // --- Dati Autista (navigazione relazione @ManyToOne) ---

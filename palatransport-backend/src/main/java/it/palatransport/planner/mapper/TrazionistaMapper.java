@@ -12,7 +12,7 @@ import org.mapstruct.MappingTarget;
  * Tutti i campi di Trazionista hanno lo stesso nome nei DTO,
  * quindi MapStruct li mappa automaticamente senza bisogno di @Mapping espliciti.
  */
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", unmappedTargetPolicy = org.mapstruct.ReportingPolicy.IGNORE)
 public interface TrazionistaMapper {
 
     TrazionistaResponse toResponse(Trazionista trazionista);

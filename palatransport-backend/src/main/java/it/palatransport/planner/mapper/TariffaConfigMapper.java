@@ -15,7 +15,7 @@ import org.mapstruct.MappingTarget;
  * nell'Entity, non inviato dal client), quindi MapStruct lo ignora
  * automaticamente nel fromRequest perché non esiste nel DTO sorgente.
  */
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", unmappedTargetPolicy = org.mapstruct.ReportingPolicy.IGNORE)
 public interface TariffaConfigMapper {
 
     TariffaConfigResponse toResponse(TariffaConfig config);

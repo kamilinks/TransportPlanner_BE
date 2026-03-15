@@ -15,12 +15,14 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 @RequiredArgsConstructor
+@lombok.extern.slf4j.Slf4j
 public class ClienteService {
 
     private final ClienteRepository clienteRepository;
     private final ClienteMapper clienteMapper;
 
     public List<ClienteResponse> getAll() {
+        log.info("Recupero tutti i clienti");
         return clienteRepository.findAll().stream()
                 .map(clienteMapper::toResponse)
                 .collect(Collectors.toList());
@@ -33,26 +35,33 @@ public class ClienteService {
     }
 
     public ClienteResponse getById(Long id) {
+        log.info("Recupero cliente con id: {}", id);
         Cliente cliente = clienteRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Cliente non trovato con id: " + id));
+                .orElseThrow(() -> new it.palatransport.planner.exception.ResourceNotFoundException("Cliente non trovato con id: " + id));
         return clienteMapper.toResponse(cliente);
     }
 
     public ClienteResponse create(ClienteRequest request) {
+        log.info("Creazione nuovo cliente: {}", request.getNome());
         Cliente cliente = clienteMapper.toEntity(request);
         Cliente saved = clienteRepository.save(cliente);
         return clienteMapper.toResponse(saved);
     }
 
     public ClienteResponse update(Long id, ClienteRequest request) {
+        log.info("Aggiornamento cliente con id: {}", id);
         Cliente cliente = clienteRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Cliente non trovato con id: " + id));
+                .orElseThrow(() -> new it.palatransport.planner.exception.ResourceNotFoundException("Cliente non trovato con id: " + id));
         clienteMapper.updateEntity(request, cliente);
         Cliente updated = clienteRepository.save(cliente);
         return clienteMapper.toResponse(updated);
     }
 
     public void delete(Long id) {
+        log.warn("Eliminazione cliente con id: {}", id);
+        if (!clienteRepository.existsById(id)) {
+            throw new it.palatransport.planner.exception.ResourceNotFoundException("Cliente non trovato con id: " + id);
+        }
         clienteRepository.deleteById(id);
     }
 }

@@ -6,7 +6,7 @@ import it.palatransport.planner.model.Cliente;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", unmappedTargetPolicy = org.mapstruct.ReportingPolicy.IGNORE)
 public interface ClienteMapper {
     ClienteResponse toResponse(Cliente cliente);
     Cliente toEntity(ClienteRequest request);

@@ -18,7 +18,9 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Veicolo {
+@org.hibernate.annotations.SQLDelete(sql = "UPDATE veicoli SET deleted = true WHERE id=?")
+@org.hibernate.annotations.SQLRestriction("deleted = false")
+public class Veicolo extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

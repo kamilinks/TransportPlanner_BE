@@ -14,11 +14,14 @@ import lombok.*;
  */
 @Entity
 @Table(name = "descrizioni_viaggio")
-@Data
-@Builder
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class DescrizioneViaggio {
+@Builder
+@org.hibernate.annotations.SQLDelete(sql = "UPDATE descrizioni_viaggio SET deleted = true WHERE id=?")
+@org.hibernate.annotations.SQLRestriction("deleted = false")
+public class DescrizioneViaggio extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

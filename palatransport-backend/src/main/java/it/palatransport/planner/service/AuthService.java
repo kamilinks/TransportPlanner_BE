@@ -74,7 +74,7 @@ public class AuthService {
         UserDetails userDetails = org.springframework.security.core.userdetails.User.builder()
                 .username(user.getEmail())
                 .password(user.getPassword())
-                .roles("USER")
+                .roles(user.getRole() != null ? user.getRole().name() : "USER")
                 .build();
 
         // Step 4: Genera il token JWT
@@ -87,6 +87,7 @@ public class AuthService {
                 .email(user.getEmail())
                 .nome(user.getNome())
                 .cognome(user.getCognome())
+                .role(user.getRole() != null ? user.getRole().name() : "USER")
                 .build();
     }
 
@@ -116,6 +117,7 @@ public class AuthService {
                 .email(request.getEmail())
                 // Hashing della password prima del salvataggio! (MOLTO IMPORTANTE)
                 .password(passwordEncoder.encode(request.getPassword()))
+                .role(User.Role.USER) // Default role
                 .build();
 
         // Step 3: Salva nel database
@@ -125,7 +127,7 @@ public class AuthService {
         UserDetails userDetails = org.springframework.security.core.userdetails.User.builder()
                 .username(savedUser.getEmail())
                 .password(savedUser.getPassword())
-                .roles("USER")
+                .roles(savedUser.getRole().name())
                 .build();
 
         String token = jwtUtils.generateToken(userDetails);
@@ -137,6 +139,7 @@ public class AuthService {
                 .email(savedUser.getEmail())
                 .nome(savedUser.getNome())
                 .cognome(savedUser.getCognome())
+                .role(savedUser.getRole().name())
                 .build();
     }
 }

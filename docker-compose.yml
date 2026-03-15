@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  # DATABASE: PostgreSQL
+  db:
+    image: postgres:15-alpine
+    container_name: palatransport-db
+    environment:
+      POSTGRES_DB: palatransportdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d palatransportdb"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # BACKEND: Spring Boot
+  backend:
+    build: ./palatransport-backend
+    container_name: palatransport-backend
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/palatransportdb
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: password
+      JWT_SECRET: palatransport-secret-key-for-jwt-signing-2024
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # FRONTEND: Angular + Nginx
+  frontend:
+    build: ./palatransport-planner
+    container_name: palatransport-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:

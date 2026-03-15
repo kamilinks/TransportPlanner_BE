@@ -44,6 +44,7 @@ public class DataInitializer implements CommandLineRunner {
                     .password(passwordEncoder.encode("11"))
                     .nome("Mirko")
                     .cognome("Mameli")
+                    .role(User.Role.ADMIN)
                     .build());
 
             userRepository.save(User.builder()
@@ -51,6 +52,7 @@ public class DataInitializer implements CommandLineRunner {
                     .password(passwordEncoder.encode("operatore123"))
                     .nome("Luca")
                     .cognome("Bianchi")
+                    .role(User.Role.USER)
                     .build());
 
             log.info("Utenti creati: mirko@mirko.it, operatore@palatransport.it");

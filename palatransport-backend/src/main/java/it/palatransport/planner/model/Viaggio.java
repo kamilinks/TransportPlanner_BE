@@ -27,11 +27,14 @@ import java.time.LocalDate;
  */
 @Entity
 @Table(name = "viaggi")
-@Data
-@Builder
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Viaggio {
+@Builder
+@org.hibernate.annotations.SQLDelete(sql = "UPDATE viaggi SET deleted = true WHERE id=?")
+@org.hibernate.annotations.SQLRestriction("deleted = false")
+public class Viaggio extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

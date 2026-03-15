@@ -1,7 +1,9 @@
 package it.palatransport.planner.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import java.time.LocalDate;
 
 /**
@@ -20,6 +22,8 @@ import java.time.LocalDate;
  */
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ViaggioResponse {
     private Long id;
     private LocalDate data;

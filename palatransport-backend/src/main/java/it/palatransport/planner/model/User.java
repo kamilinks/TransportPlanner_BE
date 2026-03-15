@@ -30,11 +30,16 @@ import lombok.*;
  */
 @Entity
 @Table(name = "users")
-@Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class User {
+public class User extends BaseEntity {
+
+    public enum Role {
+        USER, ADMIN
+    }
 
     /**
      * @Id → Questa è la chiave primaria della tabella (campo univoco identificativo).
@@ -66,4 +71,8 @@ public class User {
 
     @Column(nullable = false)
     private String cognome;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role;
 }

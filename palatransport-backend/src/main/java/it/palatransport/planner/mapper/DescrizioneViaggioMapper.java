@@ -12,7 +12,7 @@ import org.mapstruct.MappingTarget;
  * Tutti i campi (codice, descrizione, attivo) hanno lo stesso nome
  * nell'Entity e nei DTO: mapping automatico al 100%.
  */
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", unmappedTargetPolicy = org.mapstruct.ReportingPolicy.IGNORE)
 public interface DescrizioneViaggioMapper {
 
     DescrizioneViaggioResponse toResponse(DescrizioneViaggio descrizione);

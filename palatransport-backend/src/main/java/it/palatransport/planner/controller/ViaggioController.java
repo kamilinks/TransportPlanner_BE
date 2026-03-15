@@ -62,8 +62,19 @@ public class ViaggioController {
         if (autistaId != null) {
             return ResponseEntity.ok(viaggioService.getByAutista(autistaId));
         }
-        // Altrimenti restituisce tutti (potresti aggiungere il filtro per date con getByDateRange)
+        // Altrimenti restituisce tutti
         return ResponseEntity.ok(viaggioService.getAll());
+    }
+
+    /**
+     * GET /api/viaggi/paged
+     * Restituisce i viaggi con supporto alla paginazione (es: ?page=0&size=20&sort=data,desc).
+     */
+    @GetMapping("/paged")
+    public ResponseEntity<org.springframework.data.domain.Page<ViaggioResponse>> getAllPaged(
+            org.springframework.data.domain.Pageable pageable
+    ) {
+        return ResponseEntity.ok(viaggioService.getAllPaginated(pageable));
     }
 
     /**

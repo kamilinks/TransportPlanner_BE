@@ -38,12 +38,30 @@ import java.util.stream.Collectors;
 public class GlobalExceptionHandler {
 
     /**
-     * Gestisce i RuntimeException generici (es. "Autista non trovato con id: X").
+     * Gestisce i ResourceNotFoundException (es. "Autista non trovato").
      * Li mappa a HTTP 404 Not Found.
+     */
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleResourceNotFound(ResourceNotFoundException ex) {
+        return buildErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage());
+    }
+
+    /**
+     * Gestisce i BusinessException (errori di logica).
+     * Li mappa a HTTP 422 Unprocessable Entity.
+     */
+    @ExceptionHandler(BusinessException.class)
+    public ResponseEntity<Map<String, Object>> handleBusinessException(BusinessException ex) {
+        return buildErrorResponse(HttpStatus.UNPROCESSABLE_ENTITY, ex.getMessage());
+    }
+
+    /**
+     * Gestisce i RuntimeException generici non catturati.
+     * Li mappa a HTTP 500 Internal Server Error per sicurezza.
      */
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<Map<String, Object>> handleRuntimeException(RuntimeException ex) {
-        return buildErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage());
+        return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Errore interno del server: " + ex.getMessage());
     }
 
     /**
@@ -52,7 +70,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<Map<String, Object>> handleDataIntegrity(DataIntegrityViolationException ex) {
-        return buildErrorResponse(HttpStatus.CONFLICT, "Impossibile eliminare l'elemento perché è attualmente in uso (ad esempio, è associato a un viaggio).");
+        return buildErrorResponse(HttpStatus.CONFLICT, "Impossibile completare l'operazione a causa di un vincolo di integrità (es. l'elemento è già in uso).");
     }
 
     /**

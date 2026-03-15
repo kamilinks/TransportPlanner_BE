@@ -112,8 +112,13 @@ public class SecurityConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        // Origini permesse: il frontend Angular in sviluppo
-        config.setAllowedOrigins(List.of("http://localhost:4200", "http://127.0.0.1:4200"));
+        // Origini permesse: il frontend Angular in sviluppo e in Docker
+        config.setAllowedOrigins(List.of(
+            "http://localhost", 
+            "http://localhost:4200", 
+            "http://127.0.0.1:4200",
+            "http://127.0.0.1"
+        ));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setExposedHeaders(List.of("Authorization"));

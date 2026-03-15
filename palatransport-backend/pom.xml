@@ -36,6 +36,10 @@
         <jjwt.version>0.12.6</jjwt.version>
         <!-- Versione di MapStruct per il mapping automatico DTO ↔ Entity -->
         <mapstruct.version>1.6.3</mapstruct.version>
+        <!-- Versione di Lombok (ereditata ma meglio esplicitare per gli processor) -->
+        <lombok.version>1.18.36</lombok.version>
+        <!-- Versione del binding tra Lombok e MapStruct -->
+        <lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
     </properties>
 
     <dependencies>
@@ -151,6 +155,13 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- OPENAPI / SWAGGER: Documentazione automatica API -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>2.8.5</version>
+        </dependency>
+
     </dependencies>
 
     <build>
@@ -193,7 +204,7 @@
                         <path>
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok-mapstruct-binding</artifactId>
-                            <version>0.2.0</version>
+                            <version>${lombok-mapstruct-binding.version}</version>
                         </path>
                         <path>
                             <groupId>org.projectlombok</groupId>

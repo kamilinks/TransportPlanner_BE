@@ -16,7 +16,7 @@ import org.mapstruct.MappingTarget;
  * componentModel = "spring" → MapStruct crea un @Component Spring,
  * così possiamo iniettarlo nei Service con @RequiredArgsConstructor.
  */
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", unmappedTargetPolicy = org.mapstruct.ReportingPolicy.IGNORE)
 public interface AutistaMapper {
 
     /**
