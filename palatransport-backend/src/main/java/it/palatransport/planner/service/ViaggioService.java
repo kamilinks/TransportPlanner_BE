@@ -11,17 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * SERVICE: ViaggioService
- *
- * Refactored con MapStruct per il toResponse():
- *   PRIMA: private ViaggioResponse toResponse(Viaggio v) { return ViaggioResponse.builder()... }  (30 righe!)
- *   DOPO:  viaggioMapper.toResponse(v)  ← MapStruct lo genera con i @Mapping nel ViaggioMapper
- *
- * Il fromRequest() rimane manuale perché deve interrogare i Repository per
- * risolvere gli ID (autistaId → Autista entity, veicoloId → Veicolo entity, ecc.).
- * MapStruct non può fare query al database: questo è un limite intenzionale.
- */
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -33,9 +22,10 @@ public class ViaggioService {
     private final VeicoloRepository veicoloRepository;
     private final DescrizioneViaggioRepository descrizioneViaggioRepository;
     private final ClienteRepository clienteRepository;
-    private final PricingService pricingService; // ← nuovo: delegato per il calcolo
+    private final PricingService pricingService;
     private final ViaggioMapper viaggioMapper;
 
+    // Recupera tutti i viaggi
     @Transactional(readOnly = true)
     public List<ViaggioResponse> getAll() {
         log.info("Recupero tutti i viaggi");
@@ -45,6 +35,7 @@ public class ViaggioService {
                 .collect(Collectors.toList());
     }
 
+    // Recupera i viaggi con paginazione
     @Transactional(readOnly = true)
     public org.springframework.data.domain.Page<ViaggioResponse> getAllPaginated(org.springframework.data.domain.Pageable pageable) {
         log.info("Recupero viaggi paginati: {}", pageable);
@@ -52,6 +43,7 @@ public class ViaggioService {
                 .map(viaggioMapper::toResponse);
     }
 
+    // Recupera un viaggio per ID
     @Transactional(readOnly = true)
     public ViaggioResponse getById(Long id) {
         log.info("Recupero viaggio con id: {}", id);
@@ -60,6 +52,7 @@ public class ViaggioService {
         return viaggioMapper.toResponse(viaggio);
     }
 
+    // Recupera i viaggi di un autista
     @Transactional(readOnly = true)
     public List<ViaggioResponse> getByAutista(Long autistaId) {
         log.info("Recupero viaggi per autista: {}", autistaId);
@@ -69,6 +62,7 @@ public class ViaggioService {
                 .collect(Collectors.toList());
     }
 
+    // Crea un nuovo viaggio
     public ViaggioResponse create(ViaggioRequest request) {
         log.info("Creazione nuovo viaggio per autista id: {}", request.getAutistaId());
         Viaggio viaggio = fromRequest(request, new Viaggio());
@@ -76,6 +70,7 @@ public class ViaggioService {
         return viaggioMapper.toResponse(viaggioRepository.save(viaggio));
     }
 
+    // Aggiorna un viaggio esistente
     public ViaggioResponse update(Long id, ViaggioRequest request) {
         log.info("Aggiornamento viaggio con id: {}", id);
         Viaggio esistente = viaggioRepository.findById(id)
@@ -85,6 +80,7 @@ public class ViaggioService {
         return viaggioMapper.toResponse(viaggioRepository.save(esistente));
     }
 
+    // Elimina un viaggio
     public void delete(Long id) {
         log.warn("Eliminazione viaggio con id: {}", id);
         if (!viaggioRepository.existsById(id)) {
@@ -93,14 +89,7 @@ public class ViaggioService {
         viaggioRepository.deleteById(id);
     }
 
-    // =========================================================================
-    // METODI PRIVATI — rimangono manuali perché accedono ai Repository
-    // =========================================================================
-
-    /**
-     * Mapping DTO → Entity per Viaggio.
-     * Rimane manuale perché risolve gli ID in Entity tramite query al database.
-     */
+    // Converte la request in entità risolvendo le dipendenze
     private Viaggio fromRequest(ViaggioRequest request, Viaggio viaggio) {
         viaggio.setData(request.getData());
         viaggio.setLuogoPartenza(request.getLuogoPartenza());
@@ -115,7 +104,6 @@ public class ViaggioService {
         viaggio.setLavoroAggiuntivo(request.isLavoroAggiuntivo());
         viaggio.setNote(request.getNote());
 
-        // Risolve gli ID → Entity (richiede query DB: non delegabile a MapStruct)
         Autista autista = autistaRepository.findById(request.getAutistaId())
                 .orElseThrow(() -> new it.palatransport.planner.exception.ResourceNotFoundException("Autista non trovato: " + request.getAutistaId()));
         viaggio.setAutista(autista);
@@ -133,7 +121,6 @@ public class ViaggioService {
             viaggio.setDescrizioneDiscesa(descrizioneViaggioRepository.findById(request.getDescrizioneDiscesaId()).orElse(null));
         }
 
-        // Risoluzione Clienti
         if (request.getClienteSalitaId() != null) {
             viaggio.setClienteSalita(clienteRepository.findById(request.getClienteSalitaId()).orElse(null));
         }

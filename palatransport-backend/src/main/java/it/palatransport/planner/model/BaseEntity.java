@@ -13,10 +13,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
-/**
- * Superclasse per tutte le entità.
- * Include campi di Auditing (chi/quando) e Soft Delete.
- */
+// Classe base per fornire auditing e soft delete a tutte le entità
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
 @Getter
@@ -37,10 +34,6 @@ public abstract class BaseEntity {
     @LastModifiedBy
     private String lastModifiedBy;
 
-    /**
-     * Campo per il Soft Delete.
-     * true = record eliminato (ma presente nel DB), false = record attivo.
-     */
     @Column(nullable = false)
     private boolean deleted = false;
 }

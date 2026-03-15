@@ -11,12 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-/**
- * CONTROLLER: DescrizioneViaggioController
- *
- * CRUD per le descrizioni dei viaggi (etichette predefinite come "Carico merce").
- * Refactored: ora usa DescrizioneViaggioService e DTO.
- */
+// Controller descrizioni viaggi
 @RestController
 @RequestMapping("/api/descrizioni-viaggio")
 @CrossOrigin(origins = "http://localhost:4200")
@@ -25,25 +20,25 @@ public class DescrizioneViaggioController {
 
     private final DescrizioneViaggioService descrizioneViaggioService;
 
+    // Elenco descrizioni
     @GetMapping
     public ResponseEntity<List<DescrizioneViaggioResponse>> getAll() {
         return ResponseEntity.ok(descrizioneViaggioService.getAll());
     }
 
-    /**
-     * GET /api/descrizioni-viaggio/attive
-     * Restituisce solo le descrizioni attive (per i dropdown del frontend).
-     */
+    // Elenco descrizioni attive
     @GetMapping("/attive")
     public ResponseEntity<List<DescrizioneViaggioResponse>> getAllAttive() {
         return ResponseEntity.ok(descrizioneViaggioService.getAllAttive());
     }
 
+    // Dettaglio descrizione per ID
     @GetMapping("/{id}")
     public ResponseEntity<DescrizioneViaggioResponse> getById(@PathVariable Long id) {
         return ResponseEntity.ok(descrizioneViaggioService.getById(id));
     }
 
+    // Creazione descrizione
     @PostMapping
     public ResponseEntity<DescrizioneViaggioResponse> create(
             @Valid @RequestBody DescrizioneViaggioRequest request
@@ -51,6 +46,7 @@ public class DescrizioneViaggioController {
         return ResponseEntity.status(HttpStatus.CREATED).body(descrizioneViaggioService.create(request));
     }
 
+    // Aggiornamento descrizione
     @PutMapping("/{id}")
     public ResponseEntity<DescrizioneViaggioResponse> update(
             @PathVariable Long id,
@@ -59,6 +55,7 @@ public class DescrizioneViaggioController {
         return ResponseEntity.ok(descrizioneViaggioService.update(id, request));
     }
 
+    // Eliminazione descrizione
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         descrizioneViaggioService.delete(id);

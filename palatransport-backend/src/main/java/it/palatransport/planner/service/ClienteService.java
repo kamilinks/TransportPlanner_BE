@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
+// Servizio gestione clienti
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -21,6 +22,7 @@ public class ClienteService {
     private final ClienteRepository clienteRepository;
     private final ClienteMapper clienteMapper;
 
+    // Elenco tutti i clienti
     public List<ClienteResponse> getAll() {
         log.info("Recupero tutti i clienti");
         return clienteRepository.findAll().stream()
@@ -28,12 +30,14 @@ public class ClienteService {
                 .collect(Collectors.toList());
     }
 
+    // Elenco clienti attivi
     public List<ClienteResponse> getAttivi() {
         return clienteRepository.findByAttivoTrue().stream()
                 .map(clienteMapper::toResponse)
                 .collect(Collectors.toList());
     }
 
+    // Ricerca cliente per ID
     public ClienteResponse getById(Long id) {
         log.info("Recupero cliente con id: {}", id);
         Cliente cliente = clienteRepository.findById(id)
@@ -41,6 +45,7 @@ public class ClienteService {
         return clienteMapper.toResponse(cliente);
     }
 
+    // Creazione cliente
     public ClienteResponse create(ClienteRequest request) {
         log.info("Creazione nuovo cliente: {}", request.getNome());
         Cliente cliente = clienteMapper.toEntity(request);
@@ -48,6 +53,7 @@ public class ClienteService {
         return clienteMapper.toResponse(saved);
     }
 
+    // Aggiornamento cliente
     public ClienteResponse update(Long id, ClienteRequest request) {
         log.info("Aggiornamento cliente con id: {}", id);
         Cliente cliente = clienteRepository.findById(id)
@@ -57,6 +63,7 @@ public class ClienteService {
         return clienteMapper.toResponse(updated);
     }
 
+    // Eliminazione cliente
     public void delete(Long id) {
         log.warn("Eliminazione cliente con id: {}", id);
         if (!clienteRepository.existsById(id)) {

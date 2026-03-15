@@ -8,10 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-/**
- * Service dedicato al calcolo delle tariffe.
- * Segue il principio di Single Responsibility (SRP).
- */
+// Servizio calcolo tariffe
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -19,9 +16,7 @@ public class PricingService {
 
     private final TariffaConfigRepository tariffaConfigRepository;
 
-    /**
-     * Calcola le tariffe per un viaggio basandosi sulla configurazione nel DB.
-     */
+    // Calcolo tariffe viaggio
     public void calcolaTariffa(Viaggio viaggio, ViaggioRequest request) {
         log.debug("Calcolo tariffa per viaggio del {}", request.getData());
         

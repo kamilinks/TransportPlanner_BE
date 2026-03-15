@@ -6,15 +6,13 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * REPOSITORY: DescrizioneViaggioRepository
- */
+// Repository descrizioni viaggi
 @Repository
 public interface DescrizioneViaggioRepository extends JpaRepository<DescrizioneViaggio, Long> {
 
-    /** Trova per codice univoco (es. "CARICO") */
+    // Trova per codice univoco
     Optional<DescrizioneViaggio> findByCodice(String codice);
 
-    /** Solo le descrizioni attive (per il dropdown nel frontend) */
+    // Trova per stato attivo
     List<DescrizioneViaggio> findByAttivo(boolean attivo);
 }

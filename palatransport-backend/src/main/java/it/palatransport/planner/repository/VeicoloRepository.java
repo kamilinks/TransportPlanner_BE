@@ -6,18 +6,16 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * REPOSITORY: VeicoloRepository
- */
+// Repository veicoli
 @Repository
 public interface VeicoloRepository extends JpaRepository<Veicolo, Long> {
 
-    /** Trova veicolo per targa (deve essere unica) */
+    // Trova per targa
     Optional<Veicolo> findByTarga(String targa);
 
-    /** Trova tutti i veicoli di un tipo specifico (SALITA o DISCESA) */
+    // Trova per tipo (discesa/salita)
     List<Veicolo> findByTipo(Veicolo.TipoVeicolo tipo);
 
-    /** Controlla se esiste già un veicolo con quella targa */
+    // Verifica esistenza targa
     boolean existsByTarga(String targa);
 }

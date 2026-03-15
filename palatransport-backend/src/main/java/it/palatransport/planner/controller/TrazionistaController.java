@@ -11,13 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-/**
- * CONTROLLER: TrazionistaController
- *
- * CRUD per i trazionisti.
- * Refactored: non accede più direttamente al repository,
- * ma delega tutta la logica a TrazionistaService e usa DTO.
- */
+// Controller trazionisti
 @RestController
 @RequestMapping("/api/trazionisti")
 @CrossOrigin(origins = "http://localhost:4200")
@@ -26,21 +20,25 @@ public class TrazionistaController {
 
     private final TrazionistaService trazionistaService;
 
+    // Elenco trazionisti
     @GetMapping
     public ResponseEntity<List<TrazionistaResponse>> getAll() {
         return ResponseEntity.ok(trazionistaService.getAll());
     }
 
+    // Dettaglio trazionista per ID
     @GetMapping("/{id}")
     public ResponseEntity<TrazionistaResponse> getById(@PathVariable Long id) {
         return ResponseEntity.ok(trazionistaService.getById(id));
     }
 
+    // Creazione trazionista
     @PostMapping
     public ResponseEntity<TrazionistaResponse> create(@Valid @RequestBody TrazionistaRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(trazionistaService.create(request));
     }
 
+    // Aggiornamento trazionista
     @PutMapping("/{id}")
     public ResponseEntity<TrazionistaResponse> update(
             @PathVariable Long id,
@@ -49,6 +47,7 @@ public class TrazionistaController {
         return ResponseEntity.ok(trazionistaService.update(id, request));
     }
 
+    // Eliminazione trazionista
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         trazionistaService.delete(id);

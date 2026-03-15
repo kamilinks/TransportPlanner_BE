@@ -3,11 +3,7 @@ package it.palatransport.planner.model;
 import jakarta.persistence.*;
 import lombok.*;
 
-/**
- * ENTITÀ JPA: Cliente
- * 
- * Rappresenta un cliente (Blue, Intermodal, Pinna, ecc.)
- */
+// Entità JPA che rappresenta un cliente dell'azienda
 @Entity
 @Table(name = "clienti")
 @Getter
