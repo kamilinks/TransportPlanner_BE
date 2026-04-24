@@ -13,4 +13,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     // Verifica esistenza email
     boolean existsByEmail(String email);
+
+    // Trova per refresh token (usato durante il rinnovo del JWT)
+    Optional<User> findByRefreshToken(String refreshToken);
 }

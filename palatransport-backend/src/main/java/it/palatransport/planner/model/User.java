@@ -2,6 +2,7 @@ package it.palatransport.planner.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import java.time.Instant;
 
 // Entità JPA per la gestione degli utenti del sistema e dell'autenticazione
 @Entity
@@ -36,4 +37,11 @@ public class User extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
+
+    // Refresh Token: valore UUID casuale, salvato in DB
+    @Column(unique = true)
+    private String refreshToken;
+
+    // Data di scadenza del Refresh Token
+    private Instant refreshTokenExpiry;
 }

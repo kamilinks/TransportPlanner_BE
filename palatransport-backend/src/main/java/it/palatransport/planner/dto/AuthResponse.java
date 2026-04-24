@@ -29,7 +29,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AuthResponse {
-    private String token;
+    private String token;           // AccessToken JWT (breve durata: 15 min)
+    private String refreshToken;    // RefreshToken UUID (lunga durata: 7 giorni)
     private Long id;
     private String email;
     private String nome;
